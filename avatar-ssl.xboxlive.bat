@@ -19,8 +19,8 @@ if not exist "%CURRENT_DIR%gmesh.exe" (
 cls
 echo Make sure the exported OBJ has the same name as the CSV.
 set /p name=Enter model name: 
-%CURRENT_DIR%gmesh -s TEXCOORD %name%.csv %name%.obj %name%_temp.obj
-%CURRENT_DIR%meshedit %name%_temp.obj %name%_build.obj
+"%CURRENT_DIR%gmesh" -s TEXCOORD %name%.csv %name%.obj %name%_temp.obj
+"%CURRENT_DIR%meshedit" %name%_temp.obj %name%_build.obj
 del %name%_temp.obj
 pause
 goto main
