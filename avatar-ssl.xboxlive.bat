@@ -19,8 +19,34 @@ if not exist "%CURRENT_DIR%gmesh.exe" (
 cls
 echo Make sure the exported OBJ has the same name as the CSV.
 set /p name=Enter model name: 
-"%CURRENT_DIR%gmesh" -s TEXCOORD %name%.csv %name%.obj %name%_temp.obj
-"%CURRENT_DIR%meshedit" %name%_temp.obj %name%_build.obj
-del %name%_temp.obj
+
+REM Read the first line (header) of the CSV
+set "header="
+for /f "usebackq delims=" %%a in ("%name%.csv") do (
+    set "header=%%a"
+    goto :process
+)
+
+:process
+echo.
+
+REM Extract all TEXCOORD columns dynamically
+for /f "tokens=* delims=," %%a in ("%header%") do (
+    set "line=%%a"
+)
+
+REM Replace commas with spaces and check each column
+for %%i in (%header%) do (
+    echo %%i | findstr /B "TEXCOORD" >nul
+    if not errorlevel 1 (
+        echo Processing %%i...
+        "%CURRENT_DIR%gmesh" -s %%i %name%.csv %name%.obj %name%_temp.obj
+        "%CURRENT_DIR%meshedit" %name%_temp.obj %name%_%%i.obj
+        del %name%_temp.obj
+	echo.
+    )
+)
+
+echo All TEXCOORD columns processed!
 pause
 goto main
